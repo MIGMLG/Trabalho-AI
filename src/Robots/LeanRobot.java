@@ -18,7 +18,7 @@ public class LeanRobot extends AdvancedRobot {
             e.printStackTrace();
         }
     }
-    boolean canShoot = true;
+    boolean canShoot;
 
     private class Dados {
         String nome;
@@ -49,9 +49,8 @@ public class LeanRobot extends AdvancedRobot {
 
     @Override
     public void onScannedRobot(ScannedRobotEvent event) {
-        scannedRobot = event;
-
         if(canShoot){
+            scannedRobot = event;
             fire(1);
             canShoot = false;
         }
@@ -102,6 +101,8 @@ public class LeanRobot extends AdvancedRobot {
 
         canShoot = true;
     }
+
+
 
     @Override
     public void onBattleEnded(BattleEndedEvent event) {
