@@ -18,6 +18,7 @@ public class LeanRobot extends AdvancedRobot {
             e.printStackTrace();
         }
     }
+    boolean canShoot = true;
 
     private class Dados {
         String nome;
@@ -29,6 +30,10 @@ public class LeanRobot extends AdvancedRobot {
             this.distancia = distancia;
             this.velocidade = velocidade;
         }
+    }
+
+    public LeanRobot() {
+        this.canShoot = true;
     }
 
     @Override
@@ -45,7 +50,11 @@ public class LeanRobot extends AdvancedRobot {
     @Override
     public void onScannedRobot(ScannedRobotEvent event) {
         scannedRobot = event;
-        fire(1);
+
+        if(canShoot){
+            fire(1);
+            canShoot = false;
+        }
     }
 
     @Override
@@ -63,27 +72,35 @@ public class LeanRobot extends AdvancedRobot {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        canShoot = true;
     }
 
     @Override
     public void onBulletMissed(BulletMissedEvent event) {
         super.onBulletMissed(event);
         Dados d = new Dados(scannedRobot.getName(), scannedRobot.getDistance(), scannedRobot.getVelocity());
+
         try {
             fw.append(d.nome + comma + d.distancia + comma + d.velocidade + comma + "falhou\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        canShoot = true;
     }
 
     @Override
     public void onBulletHitBullet(BulletHitBulletEvent event) {
         Dados d = new Dados(scannedRobot.getName(), scannedRobot.getDistance(), scannedRobot.getVelocity());
+
         try {
             fw.append(d.nome + comma + d.distancia + comma + d.velocidade + comma + "falhou\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        canShoot = true;
     }
 
     @Override
