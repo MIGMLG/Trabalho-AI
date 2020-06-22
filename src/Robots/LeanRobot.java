@@ -1,44 +1,26 @@
 package Robots;
 
+import hex.genmodel.easy.RowData;
+import hex.genmodel.MojoModel;
+import hex.genmodel.easy.EasyPredictModelWrapper;
+import hex.genmodel.easy.exception.PredictException;
+import hex.genmodel.easy.prediction.BinomialModelPrediction;
 import robocode.*;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.Arrays;
 
 public class LeanRobot extends AdvancedRobot {
 
-    private static final String comma = ";";
     ScannedRobotEvent scannedRobot;
-    static FileWriter fw;
-    static {
-        try {
-            fw = new FileWriter("Dataset_IA_LeanTeam.csv");
-            fw.write("Alvo da Bala" + comma + "Distancia" + comma + "Velocidade do Inimigo" + comma + "Resutlado\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    boolean canShoot;
+    EasyPredictModelWrapper model;
 
-    private class Dados {
-        String nome;
-        Double distancia;
-        Double velocidade;
-
-        public Dados(String nome, Double distancia, Double velocidade) {
-            this.nome = nome;
-            this.distancia = distancia;
-            this.velocidade = velocidade;
-        }
-    }
-
-    public LeanRobot() {
-        this.canShoot = true;
+    public LeanRobot() throws IOException {
+        model = new EasyPredictModelWrapper(MojoModel.load("H2O Models/DRF_ROBOCODE_36.zip"));
     }
 
     @Override
     public void run() {
-
         while (true) {
             this.setAhead(100);
             this.setTurnRight(100);
@@ -49,70 +31,35 @@ public class LeanRobot extends AdvancedRobot {
 
     @Override
     public void onScannedRobot(ScannedRobotEvent event) {
-        if(canShoot){
+
+        try {
+
             scannedRobot = event;
-            fire(1);
-            canShoot = false;
-        }
-    }
 
-    @Override
-    public void onBulletHit(BulletHitEvent event) {
-        super.onBulletHit(event);
+            RowData row = new RowData();
+            row.put("Alvo da Bala", scannedRobot.getName());
+            row.put("Distancia", scannedRobot.getDistance());
+            row.put("Velocidade do Inimigo", scannedRobot.getVelocity());
 
-        Dados d = new Dados(event.getName(), scannedRobot.getDistance(), scannedRobot.getVelocity());
-        try {
-            //testar se acertei em quem era suposto
-            if (event.getName().equals(event.getBullet().getVictim())) {
-                fw.append(d.nome + comma + d.distancia + comma + d.velocidade + comma + "acertou\n");
-            } else {
-                fw.append(d.nome + comma + d.distancia + comma + d.velocidade + comma + "falhou\n");
+            BinomialModelPrediction p = model.predictBinomial(row);
+
+            System.out.println("");
+            System.out.println("Probabilidade de disparar ou nao disparar:" + Arrays.toString(p.classProbabilities));
+            System.out.println("\n\nPrevisão: " + p.label);
+
+            if(p.label == "disparar"){
+                fire(1);
             }
-        } catch (Exception e) {
+
+        } catch (PredictException e) {
             e.printStackTrace();
         }
 
-        canShoot = true;
     }
-
-    @Override
-    public void onBulletMissed(BulletMissedEvent event) {
-        super.onBulletMissed(event);
-        Dados d = new Dados(scannedRobot.getName(), scannedRobot.getDistance(), scannedRobot.getVelocity());
-
-        try {
-            fw.append(d.nome + comma + d.distancia + comma + d.velocidade + comma + "falhou\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        canShoot = true;
-    }
-
-    @Override
-    public void onBulletHitBullet(BulletHitBulletEvent event) {
-        Dados d = new Dados(scannedRobot.getName(), scannedRobot.getDistance(), scannedRobot.getVelocity());
-
-        try {
-            fw.append(d.nome + comma + d.distancia + comma + d.velocidade + comma + "falhou\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        canShoot = true;
-    }
-
-
 
     @Override
     public void onBattleEnded(BattleEndedEvent event) {
         super.onBattleEnded(event);
-
-        try {
-            fw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 }
