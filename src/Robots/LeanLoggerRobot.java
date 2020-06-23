@@ -13,7 +13,7 @@ public class LeanLoggerRobot extends AdvancedRobot {
     static {
         try {
             fw = new FileWriter("Dataset_IA_LeanTeam.csv");
-            fw.write("Alvo da Bala" + comma + "Distancia" + comma + "Velocidade do Inimigo" + comma + "Resutlado\n");
+            fw.write("Alvo da Bala" + comma + "Distancia" + comma + "Velocidade do Inimigo" + comma + "Resultado\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
