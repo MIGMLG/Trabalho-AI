@@ -19,7 +19,7 @@ public class LeanRobotV3 extends AdvancedRobot {
 
 
     public LeanRobotV3() throws IOException {
-        model = new EasyPredictModelWrapper(MojoModel.load("H2O Models/DRF_V3_47.zip"));
+        model = new EasyPredictModelWrapper(MojoModel.load("H2O Models/DRF_V3_50_5000.zip"));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class LeanRobotV3 extends AdvancedRobot {
             System.out.println("Lable é isto : " + p.label);
 
             if(p.label.equals("disparar")){
-                fire(1);
+                fire(2);
                 System.out.println("Disparei");
             }
 
