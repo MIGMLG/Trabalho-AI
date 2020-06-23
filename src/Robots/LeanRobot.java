@@ -47,7 +47,7 @@ public class LeanRobot extends AdvancedRobot {
             System.out.println("Probabilidade de disparar ou nao disparar:" + Arrays.toString(p.classProbabilities));
             System.out.println("\n\nPrevisão: " + p.label);
 
-            if(p.label == "disparar"){
+            if(p.label.equals("disparar")){
                 fire(1);
             }
 
